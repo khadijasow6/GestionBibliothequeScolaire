@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Environnement virtuel
+backend/.venv/
+
+# Base de données locale
+backend/db.sqlite3
+
+# Variables d'environnement
+.env
+backend/.env
+
+# Médias
+backend/media/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# VS Code
+.vscode/
+
+# Système
+.DS_Store
+Thumbs.db
