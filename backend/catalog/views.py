@@ -3,9 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from accounts.permissions import IsLibrarianOrAdministrator
 
-from .models import Author, Book, Category
+from .models import Author, Book, BookCopy, Category
 from .serializers import (
     AuthorSerializer,
+    BookCopySerializer,
     BookSerializer,
     CategorySerializer,
 )
@@ -48,3 +49,9 @@ class BookViewSet(viewsets.ModelViewSet):
             permission_classes = [IsLibrarianOrAdministrator]
 
         return [permission() for permission in permission_classes]
+
+
+class BookCopyViewSet(viewsets.ModelViewSet):
+    queryset = BookCopy.objects.select_related("book")
+    serializer_class = BookCopySerializer
+    permission_classes = [IsLibrarianOrAdministrator]

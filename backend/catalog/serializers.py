@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Author, Book, Category
+from .models import Author, Book, BookCopy, Category
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -82,3 +82,44 @@ class BookSerializer(serializers.ModelSerializer):
             f"{author.first_name} {author.last_name}"
             for author in obj.authors.all()
         ]
+
+
+class BookCopySerializer(serializers.ModelSerializer):
+    book_title = serializers.CharField(
+        source="book.title",
+        read_only=True,
+    )
+
+    status_display = serializers.CharField(
+        source="get_status_display",
+        read_only=True,
+    )
+
+    condition_display = serializers.CharField(
+        source="get_condition_display",
+        read_only=True,
+    )
+
+    class Meta:
+        model = BookCopy
+        fields = (
+            "id",
+            "book",
+            "book_title",
+            "inventory_code",
+            "status",
+            "status_display",
+            "condition",
+            "condition_display",
+            "acquisition_date",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "book_title",
+            "status_display",
+            "condition_display",
+            "created_at",
+            "updated_at",
+        )
