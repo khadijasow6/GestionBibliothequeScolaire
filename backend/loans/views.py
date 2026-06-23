@@ -1,6 +1,8 @@
 from django.db import transaction
 from django.utils import timezone
-from rest_framework import serializers, viewsets
+from rest_framework import serializers, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from accounts.permissions import IsLibrarianOrAdministrator
 from catalog.models import BookCopy
@@ -70,3 +72,48 @@ class LoanViewSet(viewsets.ModelViewSet):
 
             book_copy.status = BookCopy.Status.EMPRUNTE
             book_copy.save(update_fields=["status", "updated_at"])
+
+    @action(detail=True, methods=["post"], url_path="return")
+    def return_book(self, request, pk=None):
+        with transaction.atomic():
+            loan = Loan.objects.select_for_update().select_related(
+                "book_copy"
+            ).get(pk=pk)
+
+            if loan.status == Loan.Status.RETOURNE:
+                return Response(
+                    {"detail": "Ce livre a déjà été retourné."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if loan.status == Loan.Status.PERDU:
+                return Response(
+                    {"detail": "Un livre déclaré perdu ne peut pas être retourné."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            loan.returned_at = timezone.now()
+            loan.status = Loan.Status.RETOURNE
+            loan.save(
+                update_fields=[
+                    "returned_at",
+                    "status",
+                    "updated_at",
+                ]
+            )
+
+            book_copy = loan.book_copy
+            book_copy.status = BookCopy.Status.DISPONIBLE
+            book_copy.save(
+                update_fields=[
+                    "status",
+                    "updated_at",
+                ]
+            )
+
+        serializer = self.get_serializer(loan)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
