@@ -1,10 +1,14 @@
+
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from accounts.permissions import IsLibrarianOrAdministrator
+from accounts.permissions import (
+    IsLibrarianOrAdministrator,
+    IsStudent,
+)
 from catalog.models import BookCopy
 
 from .models import Loan
@@ -21,7 +25,28 @@ class LoanViewSet(viewsets.ModelViewSet):
     serializer_class = LoanSerializer
     permission_classes = [IsLibrarianOrAdministrator]
 
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="my-loans",
+        permission_classes=[IsStudent],
+    )
+    def my_loans(self, request):
+        """
+        Permet à un élève de consulter uniquement ses propres emprunts.
+        """
+        loans = self.get_queryset().filter(student=request.user)
+        serializer = self.get_serializer(loans, many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
     def perform_create(self, serializer):
+        """
+        Enregistre un nouvel emprunt en appliquant les règles métier.
+        """
         student = serializer.validated_data["student"]
         selected_copy = serializer.validated_data["book_copy"]
         due_at = serializer.validated_data["due_at"]
@@ -46,10 +71,12 @@ class LoanViewSet(viewsets.ModelViewSet):
                 "Cet élève possède déjà trois emprunts actifs."
             )
 
-        if Loan.objects.filter(
+        has_overdue_loan = Loan.objects.filter(
             student=student,
             status=Loan.Status.EN_RETARD,
-        ).exists():
+        ).exists()
+
+        if has_overdue_loan:
             raise serializers.ValidationError(
                 "Cet élève possède un emprunt en retard."
             )
@@ -71,24 +98,46 @@ class LoanViewSet(viewsets.ModelViewSet):
             )
 
             book_copy.status = BookCopy.Status.EMPRUNTE
-            book_copy.save(update_fields=["status", "updated_at"])
+            book_copy.save(
+                update_fields=[
+                    "status",
+                    "updated_at",
+                ]
+            )
 
-    @action(detail=True, methods=["post"], url_path="return")
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="return",
+    )
     def return_book(self, request, pk=None):
+        """
+        Enregistre le retour d’un livre et rend l’exemplaire disponible.
+        """
         with transaction.atomic():
-            loan = Loan.objects.select_for_update().select_related(
-                "book_copy"
-            ).get(pk=pk)
+            loan = (
+                Loan.objects
+                .select_for_update()
+                .select_related("book_copy")
+                .get(pk=pk)
+            )
 
             if loan.status == Loan.Status.RETOURNE:
                 return Response(
-                    {"detail": "Ce livre a déjà été retourné."},
+                    {
+                        "detail": "Ce livre a déjà été retourné."
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
             if loan.status == Loan.Status.PERDU:
                 return Response(
-                    {"detail": "Un livre déclaré perdu ne peut pas être retourné."},
+                    {
+                        "detail": (
+                            "Un livre déclaré perdu ne peut pas "
+                            "être retourné."
+                        )
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -117,3 +166,4 @@ class LoanViewSet(viewsets.ModelViewSet):
             serializer.data,
             status=status.HTTP_200_OK,
         )
+
