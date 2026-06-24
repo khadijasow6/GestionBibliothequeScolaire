@@ -1,3 +1,4 @@
+
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -39,8 +40,33 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
 
 class BookViewSet(viewsets.ModelViewSet):
-    queryset = Book.objects.select_related("category").prefetch_related("authors")
+    queryset = (
+        Book.objects
+        .select_related("category")
+        .prefetch_related("authors")
+    )
     serializer_class = BookSerializer
+
+    filterset_fields = (
+        "category",
+        "publication_year",
+    )
+
+    search_fields = (
+        "title",
+        "isbn",
+        "publisher",
+        "authors__first_name",
+        "authors__last_name",
+    )
+
+    ordering_fields = (
+        "title",
+        "publication_year",
+        "created_at",
+    )
+
+    ordering = ("title",)
 
     def get_permissions(self):
         if self.action in ("list", "retrieve"):
@@ -55,3 +81,4 @@ class BookCopyViewSet(viewsets.ModelViewSet):
     queryset = BookCopy.objects.select_related("book")
     serializer_class = BookCopySerializer
     permission_classes = [IsLibrarianOrAdministrator]
+
