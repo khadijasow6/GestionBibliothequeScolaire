@@ -28,9 +28,6 @@ class LoanViewSet(viewsets.ModelViewSet):
     permission_classes = [IsLibrarianOrAdministrator]
 
     def get_queryset(self):
-        """
-        Met à jour les retards avant de retourner les emprunts.
-        """
         update_overdue_loans()
         return super().get_queryset()
 
@@ -40,7 +37,41 @@ class LoanViewSet(viewsets.ModelViewSet):
         url_path="my-loans",
         permission_classes=[IsStudent],
     )
-    
+    def my_loans(self, request):
+        loans = self.get_queryset().filter(
+            student=request.user,
+        )
+
+        serializer = self.get_serializer(
+            loans,
+            many=True,
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="overdue",
+    )
+    def overdue_loans(self, request):
+        loans = self.get_queryset().filter(
+            status=Loan.Status.EN_RETARD,
+        )
+
+        serializer = self.get_serializer(
+            loans,
+            many=True,
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
     @action(
         detail=False,
         methods=["get"],
@@ -64,25 +95,6 @@ class LoanViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
-
-    def my_loans(self, request):
-        """
-        Permet à un élève de consulter uniquement ses emprunts.
-        """
-        loans = self.get_queryset().filter(
-            student=request.user,
-        )
-
-        serializer = self.get_serializer(
-            loans,
-            many=True,
-        )
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK,
-        )
-    
     @action(
         detail=False,
         methods=["get"],
@@ -106,35 +118,7 @@ class LoanViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
-
-
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="overdue",
-    )
-    def overdue_loans(self, request):
-        """
-        Retourne la liste des emprunts en retard.
-        """
-        loans = self.get_queryset().filter(
-            status=Loan.Status.EN_RETARD,
-        )
-
-        serializer = self.get_serializer(
-            loans,
-            many=True,
-        )
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK,
-        )
-
     def perform_create(self, serializer):
-        """
-        Enregistre un emprunt en appliquant les règles métier.
-        """
         student = serializer.validated_data["student"]
         selected_copy = serializer.validated_data["book_copy"]
         due_at = serializer.validated_data["due_at"]
@@ -197,12 +181,66 @@ class LoanViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["post"],
+        url_path="mark-lost",
+    )
+    def mark_lost(self, request, pk=None):
+        with transaction.atomic():
+            loan = get_object_or_404(
+                Loan.objects
+                .select_for_update()
+                .select_related("book_copy"),
+                pk=pk,
+            )
+
+            if loan.status == Loan.Status.RETOURNE:
+                return Response(
+                    {
+                        "detail": (
+                            "Un emprunt déjà retourné ne peut pas "
+                            "être déclaré perdu."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if loan.status == Loan.Status.PERDU:
+                return Response(
+                    {
+                        "detail": "Ce livre est déjà déclaré perdu."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            loan.status = Loan.Status.PERDU
+            loan.save(
+                update_fields=[
+                    "status",
+                    "updated_at",
+                ]
+            )
+
+            book_copy = loan.book_copy
+            book_copy.status = BookCopy.Status.PERDU
+            book_copy.save(
+                update_fields=[
+                    "status",
+                    "updated_at",
+                ]
+            )
+
+        serializer = self.get_serializer(loan)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=True,
+        methods=["post"],
         url_path="return",
     )
     def return_book(self, request, pk=None):
-        """
-        Enregistre le retour d’un livre.
-        """
         with transaction.atomic():
             loan = get_object_or_404(
                 Loan.objects
