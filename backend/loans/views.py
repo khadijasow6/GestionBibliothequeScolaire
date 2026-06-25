@@ -1,4 +1,3 @@
-
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers, status, viewsets
@@ -13,6 +12,7 @@ from catalog.models import BookCopy
 
 from .models import Loan
 from .serializers import LoanSerializer
+from .services import update_overdue_loans
 
 
 class LoanViewSet(viewsets.ModelViewSet):
@@ -25,6 +25,10 @@ class LoanViewSet(viewsets.ModelViewSet):
     serializer_class = LoanSerializer
     permission_classes = [IsLibrarianOrAdministrator]
 
+    def get_queryset(self):
+        update_overdue_loans()
+        return super().get_queryset()
+
     @action(
         detail=False,
         methods=["get"],
@@ -32,9 +36,6 @@ class LoanViewSet(viewsets.ModelViewSet):
         permission_classes=[IsStudent],
     )
     def my_loans(self, request):
-        """
-        Permet à un élève de consulter uniquement ses propres emprunts.
-        """
         loans = self.get_queryset().filter(student=request.user)
         serializer = self.get_serializer(loans, many=True)
 
@@ -44,9 +45,6 @@ class LoanViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
-        """
-        Enregistre un nouvel emprunt en appliquant les règles métier.
-        """
         student = serializer.validated_data["student"]
         selected_copy = serializer.validated_data["book_copy"]
         due_at = serializer.validated_data["due_at"]
@@ -111,9 +109,6 @@ class LoanViewSet(viewsets.ModelViewSet):
         url_path="return",
     )
     def return_book(self, request, pk=None):
-        """
-        Enregistre le retour d’un livre et rend l’exemplaire disponible.
-        """
         with transaction.atomic():
             loan = (
                 Loan.objects
@@ -124,9 +119,7 @@ class LoanViewSet(viewsets.ModelViewSet):
 
             if loan.status == Loan.Status.RETOURNE:
                 return Response(
-                    {
-                        "detail": "Ce livre a déjà été retourné."
-                    },
+                    {"detail": "Ce livre a déjà été retourné."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -134,8 +127,7 @@ class LoanViewSet(viewsets.ModelViewSet):
                 return Response(
                     {
                         "detail": (
-                            "Un livre déclaré perdu ne peut pas "
-                            "être retourné."
+                            "Un livre déclaré perdu ne peut pas être retourné."
                         )
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -166,4 +158,3 @@ class LoanViewSet(viewsets.ModelViewSet):
             serializer.data,
             status=status.HTTP_200_OK,
         )
-
