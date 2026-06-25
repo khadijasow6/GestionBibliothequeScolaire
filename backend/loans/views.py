@@ -26,6 +26,33 @@ class LoanViewSet(viewsets.ModelViewSet):
     )
     serializer_class = LoanSerializer
     permission_classes = [IsLibrarianOrAdministrator]
+    
+    filterset_fields = (
+        "status",
+        "student",
+        "book_copy",
+    )
+
+    search_fields = (
+        "student__username",
+        "student__first_name",
+        "student__last_name",
+        "book_copy__inventory_code",
+        "book_copy__book__title",
+    )
+
+    ordering_fields = (
+        "borrowed_at",
+        "due_at",
+        "returned_at",
+        "created_at",
+    )
+
+    ordering = (
+        "-borrowed_at",
+    )
+
+
 
     def get_queryset(self):
         update_overdue_loans()
