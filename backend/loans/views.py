@@ -82,6 +82,31 @@ class LoanViewSet(viewsets.ModelViewSet):
             serializer.data,
             status=status.HTTP_200_OK,
         )
+    
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="history",
+    )
+    def loan_history(self, request):
+        loans = self.get_queryset().filter(
+            status__in=[
+                Loan.Status.RETOURNE,
+                Loan.Status.PERDU,
+            ],
+        )
+
+        serializer = self.get_serializer(
+            loans,
+            many=True,
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
 
     @action(
         detail=False,
