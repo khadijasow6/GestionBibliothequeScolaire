@@ -40,6 +40,31 @@ class LoanViewSet(viewsets.ModelViewSet):
         url_path="my-loans",
         permission_classes=[IsStudent],
     )
+    
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="active",
+    )
+    def active_loans(self, request):
+        loans = self.get_queryset().filter(
+            status__in=[
+                Loan.Status.EN_COURS,
+                Loan.Status.EN_RETARD,
+            ],
+        )
+
+        serializer = self.get_serializer(
+            loans,
+            many=True,
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
     def my_loans(self, request):
         """
         Permet à un élève de consulter uniquement ses emprunts.
