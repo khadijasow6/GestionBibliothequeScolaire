@@ -1,4 +1,6 @@
+
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
@@ -26,6 +28,9 @@ class LoanViewSet(viewsets.ModelViewSet):
     permission_classes = [IsLibrarianOrAdministrator]
 
     def get_queryset(self):
+        """
+        Met à jour les retards avant de retourner les emprunts.
+        """
         update_overdue_loans()
         return super().get_queryset()
 
@@ -36,8 +41,40 @@ class LoanViewSet(viewsets.ModelViewSet):
         permission_classes=[IsStudent],
     )
     def my_loans(self, request):
-        loans = self.get_queryset().filter(student=request.user)
-        serializer = self.get_serializer(loans, many=True)
+        """
+        Permet à un élève de consulter uniquement ses emprunts.
+        """
+        loans = self.get_queryset().filter(
+            student=request.user,
+        )
+
+        serializer = self.get_serializer(
+            loans,
+            many=True,
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="overdue",
+    )
+    def overdue_loans(self, request):
+        """
+        Retourne la liste des emprunts en retard.
+        """
+        loans = self.get_queryset().filter(
+            status=Loan.Status.EN_RETARD,
+        )
+
+        serializer = self.get_serializer(
+            loans,
+            many=True,
+        )
 
         return Response(
             serializer.data,
@@ -45,6 +82,9 @@ class LoanViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
+        """
+        Enregistre un emprunt en appliquant les règles métier.
+        """
         student = serializer.validated_data["student"]
         selected_copy = serializer.validated_data["book_copy"]
         due_at = serializer.validated_data["due_at"]
@@ -80,8 +120,9 @@ class LoanViewSet(viewsets.ModelViewSet):
             )
 
         with transaction.atomic():
-            book_copy = BookCopy.objects.select_for_update().get(
-                pk=selected_copy.pk
+            book_copy = get_object_or_404(
+                BookCopy.objects.select_for_update(),
+                pk=selected_copy.pk,
             )
 
             if book_copy.status != BookCopy.Status.DISPONIBLE:
@@ -109,17 +150,22 @@ class LoanViewSet(viewsets.ModelViewSet):
         url_path="return",
     )
     def return_book(self, request, pk=None):
+        """
+        Enregistre le retour d’un livre.
+        """
         with transaction.atomic():
-            loan = (
+            loan = get_object_or_404(
                 Loan.objects
                 .select_for_update()
-                .select_related("book_copy")
-                .get(pk=pk)
+                .select_related("book_copy"),
+                pk=pk,
             )
 
             if loan.status == Loan.Status.RETOURNE:
                 return Response(
-                    {"detail": "Ce livre a déjà été retourné."},
+                    {
+                        "detail": "Ce livre a déjà été retourné."
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -127,7 +173,8 @@ class LoanViewSet(viewsets.ModelViewSet):
                 return Response(
                     {
                         "detail": (
-                            "Un livre déclaré perdu ne peut pas être retourné."
+                            "Un livre déclaré perdu ne peut pas "
+                            "être retourné."
                         )
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -158,3 +205,4 @@ class LoanViewSet(viewsets.ModelViewSet):
             serializer.data,
             status=status.HTTP_200_OK,
         )
+
