@@ -1,0 +1,243 @@
+
+/* Tous les éléments de la barre latérale respectent leur largeur */
+.sidebar,
+.sidebar * {
+  box-sizing: border-box;
+}
+
+/* Barre latérale principale */
+.sidebar {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  width: 250px;
+  min-width: 250px;
+  height: 100vh;
+
+  padding: 24px 18px;
+
+  /* Empêche les éléments de sortir de la barre */
+  overflow: hidden;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    180deg,
+    #3e2723 0%,
+    #5d4037 55%,
+    #4e342e 100%
+  );
+
+  box-shadow: 4px 0 18px rgba(62, 39, 35, 0.18);
+}
+
+/* Logo et nom de l’application */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  width: 100%;
+  padding: 4px 6px 22px;
+}
+
+/* Logo BS */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 48px;
+  height: 48px;
+
+  font-size: 18px;
+  font-weight: 800;
+
+  color: #4e342e;
+  background-color: #fffaf5;
+
+  border-radius: 13px;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.16);
+}
+
+/* Zone contenant le titre */
+.sidebar-title {
+  min-width: 0;
+}
+
+/* Nom de l’application */
+.sidebar-title h2 {
+  margin: 0;
+
+  font-size: 18px;
+  line-height: 1.2;
+  color: #ffffff;
+
+  white-space: nowrap;
+}
+
+/* Sous-titre */
+.sidebar-title p {
+  margin-top: 4px;
+
+  font-size: 13px;
+  color: #d7ccc8;
+}
+
+/* Ligne de séparation */
+.sidebar-separator {
+  width: 100%;
+  height: 1px;
+  margin-bottom: 24px;
+
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Conteneur des liens */
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  width: 100%;
+  padding: 0 4px;
+}
+
+/* Style d’un lien */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  /* Le lien reste dans la largeur de la barre */
+  width: 100%;
+  max-width: 100%;
+
+  padding: 13px 14px;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  color: #f5ebe5;
+  text-decoration: none;
+
+  border-radius: 10px;
+
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+/* Icône située devant le texte */
+.sidebar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 22px;
+  font-size: 19px;
+}
+
+/* Effet au passage de la souris */
+.sidebar-link:hover {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Page actuellement ouverte */
+.sidebar-link.active {
+  font-weight: 700;
+  color: #4e342e;
+  text-decoration: none;
+
+  background-color: #fff7f1;
+
+  /* Ombre intérieure qui ne dépasse pas */
+  box-shadow: inset 0 0 0 1px rgba(78, 52, 46, 0.1);
+}
+
+/* Utilisateur affiché en bas */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  width: 100%;
+  margin-top: auto;
+  padding: 15px 12px;
+
+  overflow: hidden;
+
+  background-color: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+}
+
+/* Première lettre de l’utilisateur */
+.sidebar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 39px;
+  height: 39px;
+
+  font-weight: 700;
+  color: #4e342e;
+
+  background-color: #fff7f1;
+  border-radius: 50%;
+}
+
+/* Nom de l’utilisateur */
+.sidebar-user strong {
+  display: block;
+  max-width: 130px;
+  overflow: hidden;
+
+  font-size: 14px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Rôle de l’utilisateur */
+.sidebar-user p {
+  margin-top: 3px;
+
+  font-size: 11px;
+  color: #d7ccc8;
+}
+
+/* Adaptation pour les petits écrans */
+@media (max-width: 800px) {
+  .sidebar {
+    position: static;
+
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+  }
+
+  .sidebar-navigation {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sidebar-link {
+    width: auto;
+  }
+
+  .sidebar-user {
+    display: none;
+  }
+}
+

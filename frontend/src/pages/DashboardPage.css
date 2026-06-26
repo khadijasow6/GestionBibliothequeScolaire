@@ -1,12 +1,22 @@
 
-/* Page générale du tableau de bord */
-.dashboard-page {
+/* Contient la barre latérale et la partie principale */
+.dashboard-layout {
+  display: flex;
+  width: 100%;
   min-height: 100vh;
   background-color: #f5efe9;
-  color: #3e2723;
 }
 
-/* En-tête supérieur */
+/* Partie principale située à droite de la barre latérale */
+.dashboard-page {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  color: #3e2723;
+  background-color: #f5efe9;
+}
+
+/* En-tête supérieur du tableau de bord */
 .dashboard-header {
   display: flex;
   align-items: center;
@@ -27,7 +37,7 @@
   font-size: 30px;
 }
 
-/* Petit texte de bienvenue */
+/* Texte de bienvenue */
 .dashboard-header p {
   color: #efebe9;
 }
@@ -45,40 +55,41 @@
     transform 0.2s;
 }
 
-/* Effet lorsque la souris passe sur le bouton */
+/* Effet au passage de la souris */
 .logout-button:hover {
   background-color: #f3e5dc;
   transform: translateY(-1px);
 }
 
-/* Contenu principal sous l’en-tête */
+/* Contenu principal */
 .dashboard-content {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 40px;
-  overflow: hidden;
 }
-/* Titre du rôle */
+
+/* Titre affichant le rôle */
 .dashboard-content h2 {
   margin-bottom: 28px;
   font-size: 22px;
   color: #5d4037;
 }
 
-/* Grille contenant les cartes statistiques */
+/* Grille contenant les statistiques */
 .stats-grid {
   display: grid;
-
-  /* Maximum quatre cartes par ligne */
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
+  grid-template-columns: repeat(
+    4,
+    minmax(0, 1fr)
+  );
   gap: 22px;
   width: 100%;
 }
 
-/* Une carte de statistique */
+/* Carte représentant une statistique */
 .stat-card {
+  min-width: 0;
   padding: 26px;
   background-color: #ffffff;
   border: 1px solid #e7d8ce;
@@ -89,7 +100,7 @@
     box-shadow 0.2s;
 }
 
-/* Effet au passage de la souris */
+/* Effet lorsque la souris passe sur une carte */
 .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(78, 52, 46, 0.16);
@@ -109,16 +120,42 @@
   color: #4e342e;
 }
 
-/* Deux cartes par ligne sur une tablette */
-@media (max-width: 1000px) {
+/* Deux cartes par ligne sur les écrans moyens */
+@media (max-width: 1100px) {
   .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
   }
 }
 
-/* Une seule carte par ligne sur un téléphone */
+/* Adaptation pour les tablettes et téléphones */
+@media (max-width: 800px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+  }
+
+  .dashboard-content {
+    padding: 28px 20px;
+  }
+
+  .logout-button {
+    width: 100%;
+  }
+}
+
+/* Une seule carte par ligne sur les téléphones */
 @media (max-width: 600px) {
   .stats-grid {
     grid-template-columns: 1fr;
   }
 }
+
