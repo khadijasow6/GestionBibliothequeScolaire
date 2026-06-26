@@ -91,3 +91,96 @@
   border-radius: 9px;
 }
 
+/* Contient les boutons d’action d’un emprunt */
+.loan-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+}
+
+/* Style commun aux boutons Retourner et Déclarer perdu */
+.loan-actions button {
+  padding: 8px 11px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  border: none;
+  border-radius: 7px;
+
+  transition:
+    transform 0.2s,
+    opacity 0.2s,
+    background-color 0.2s;
+}
+
+/* Bouton permettant d’enregistrer le retour */
+.return-button {
+  color: #ffffff;
+  background-color: #2f6f4e;
+}
+
+/* Effet lorsque la souris passe sur Retourner */
+.return-button:hover {
+  background-color: #24583e;
+  transform: translateY(-1px);
+}
+
+/* Bouton permettant de déclarer un livre perdu */
+.lost-button {
+  color: #ffffff;
+  background-color: #a94442;
+}
+
+/* Effet lorsque la souris passe sur Déclarer perdu */
+.lost-button:hover {
+  background-color: #873735;
+  transform: translateY(-1px);
+}
+
+/* Apparence d’un bouton pendant le traitement */
+.loan-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+/* Texte affiché lorsqu’aucune action n’est possible */
+.no-action {
+  font-size: 13px;
+  color: #8d6e63;
+}
+
+/* Message affiché après une action réussie */
+.loans-success {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  color: #166534;
+  background-color: #dcfce7;
+
+  border: 1px solid #86efac;
+  border-radius: 9px;
+}
+
+/* Ajoute un espace sous le message d’erreur */
+.loans-error {
+  margin-bottom: 20px;
+}
+
+/* Adaptation des boutons sur les petits écrans */
+@media (max-width: 700px) {
+  .loan-actions {
+    align-items: stretch;
+    flex-direction: column;
+    min-width: 140px;
+  }
+
+  .loan-actions button {
+    width: 100%;
+  }
+}
+
+
+

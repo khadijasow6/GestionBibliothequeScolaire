@@ -17,41 +17,111 @@ function LoansPage() {
   // Liste des emprunts reçue depuis Django.
   const [loans, setLoans] = useState([]);
 
-  // État du chargement.
+  // Indique si la liste est en cours de chargement.
   const [isLoading, setIsLoading] = useState(true);
 
-  // Message d’erreur éventuel.
+  // Identifiant de l’emprunt dont une action est en cours.
+  const [actionLoading, setActionLoading] = useState(null);
+
+  // Message d’erreur.
   const [error, setError] = useState("");
 
-  // Charge les emprunts lorsque la page s’ouvre.
+  // Message de réussite.
+  const [success, setSuccess] = useState("");
+
+  // Charge les emprunts depuis Django.
+  const loadLoans = async () => {
+    try {
+      const response = await api.get("/loans/");
+
+      // Accepte une réponse directe ou paginée.
+      const loanList = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
+
+      setLoans(loanList);
+    } catch (requestError) {
+      console.error(requestError);
+
+      setError(
+        "Impossible de charger la liste des emprunts.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Exécute le chargement à l’ouverture de la page.
   useEffect(() => {
-    const loadLoans = async () => {
-      try {
-        const response = await api.get("/loans/");
-
-        // Accepte une réponse directe ou paginée.
-        const loanList = Array.isArray(response.data)
-          ? response.data
-          : response.data.results || [];
-
-        setLoans(loanList);
-      } catch (requestError) {
-        console.error(requestError);
-
-        setError(
-          "Impossible de charger la liste des emprunts.",
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadLoans();
   }, []);
 
   // Retourne une classe CSS différente selon le statut.
   const getStatusClass = (status) => {
     return `loan-status loan-status-${status.toLowerCase()}`;
+  };
+
+  // Enregistre le retour d’un livre.
+  const handleReturn = async (loanId) => {
+    setError("");
+    setSuccess("");
+    setActionLoading(loanId);
+
+    try {
+      await api.post(`/loans/${loanId}/return/`);
+
+      setSuccess(
+        "Le retour du livre a été enregistré.",
+      );
+
+      // Recharge la liste pour afficher le nouveau statut.
+      await loadLoans();
+    } catch (requestError) {
+      console.error(requestError);
+
+      setError(
+        requestError.response?.data?.detail ||
+          "Impossible d’enregistrer le retour.",
+      );
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Déclare un livre comme perdu.
+  const handleMarkLost = async (loanId) => {
+    // Demande une confirmation avant l’action.
+    const confirmed = window.confirm(
+      "Voulez-vous vraiment déclarer ce livre perdu ?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+    setActionLoading(loanId);
+
+    try {
+      await api.post(`/loans/${loanId}/mark-lost/`);
+
+      setSuccess(
+        "Le livre a été déclaré perdu.",
+      );
+
+      // Recharge la liste pour afficher le nouveau statut.
+      await loadLoans();
+    } catch (requestError) {
+      console.error(requestError);
+
+      setError(
+        requestError.response?.data?.detail ||
+          "Impossible de déclarer ce livre perdu.",
+      );
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   return (
@@ -81,13 +151,16 @@ function LoansPage() {
             <p className="loans-error">{error}</p>
           )}
 
+          {success && (
+            <p className="loans-success">{success}</p>
+          )}
+
           {!isLoading &&
             !error &&
             loans.length === 0 && (
               <p>Aucun emprunt enregistré.</p>
             )}
 
-          {/* Tableau des emprunts */}
           {!isLoading && loans.length > 0 && (
             <div className="loans-table-container">
               <table className="loans-table">
@@ -98,37 +171,84 @@ function LoansPage() {
                     <th>Exemplaire</th>
                     <th>Date limite</th>
                     <th>Statut</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {loans.map((loan) => (
-                    <tr key={loan.id}>
-                      <td>
-                        <strong>{loan.book_title}</strong>
-                      </td>
+                  {loans.map((loan) => {
+                    // Les actions sont disponibles uniquement
+                    // pour un emprunt actif ou en retard.
+                    const canManage =
+                      loan.status === "EN_COURS" ||
+                      loan.status === "EN_RETARD";
 
-                      <td>{loan.student_name}</td>
+                    return (
+                      <tr key={loan.id}>
+                        <td>
+                          <strong>
+                            {loan.book_title}
+                          </strong>
+                        </td>
 
-                      <td>{loan.inventory_code}</td>
+                        <td>{loan.student_name}</td>
 
-                      <td>
-                        {new Date(
-                          loan.due_at,
-                        ).toLocaleDateString("fr-FR")}
-                      </td>
+                        <td>{loan.inventory_code}</td>
 
-                      <td>
-                        <span
-                          className={getStatusClass(
-                            loan.status,
+                        <td>
+                          {new Date(
+                            loan.due_at,
+                          ).toLocaleDateString("fr-FR")}
+                        </td>
+
+                        <td>
+                          <span
+                            className={getStatusClass(
+                              loan.status,
+                            )}
+                          >
+                            {loan.status_display}
+                          </span>
+                        </td>
+
+                        <td>
+                          {canManage ? (
+                            <div className="loan-actions">
+                              <button
+                                className="return-button"
+                                type="button"
+                                disabled={
+                                  actionLoading === loan.id
+                                }
+                                onClick={() => {
+                                  handleReturn(loan.id);
+                                }}
+                              >
+                                Retourner
+                              </button>
+
+                              <button
+                                className="lost-button"
+                                type="button"
+                                disabled={
+                                  actionLoading === loan.id
+                                }
+                                onClick={() => {
+                                  handleMarkLost(loan.id);
+                                }}
+                              >
+                                Déclarer perdu
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="no-action">
+                              Aucune action
+                            </span>
                           )}
-                        >
-                          {loan.status_display}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
