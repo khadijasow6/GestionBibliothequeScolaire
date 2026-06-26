@@ -1,6 +1,11 @@
 // Page permettant à l’élève de consulter ses emprunts.
 import MyLoansPage from "./pages/MyLoansPage";
 // Outils permettant de gérer les différentes pages React.
+
+// Page de gestion des utilisateurs réservée à l’administrateur.
+import UsersPage from "./pages/UsersPage";
+
+
 import {
   BrowserRouter,
   Navigate,
@@ -81,6 +86,20 @@ function App() {
     )
   }
 />
+
+{/* Page de gestion des utilisateurs */}
+<Route
+  path="/users"
+  element={
+    token ? (
+      <UsersPage />
+    ) : (
+      <Navigate to="/login" replace />
+    )
+  }
+/>
+
+
 
         {/* Toute adresse inconnue retourne vers une page valide */}
         <Route

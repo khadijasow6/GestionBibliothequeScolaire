@@ -1,0 +1,91 @@
+/* Conteneur du tableau des utilisateurs */
+.users-table-container {
+  width: 100%;
+  overflow-x: auto;
+
+  background-color: #ffffff;
+  border: 1px solid #e2d2c7;
+  border-radius: 14px;
+
+  box-shadow: 0 8px 24px rgba(78, 52, 46, 0.1);
+}
+
+/* Tableau principal */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* En-têtes du tableau */
+.users-table th {
+  padding: 16px;
+
+  text-align: left;
+  color: #ffffff;
+  background-color: #5d4037;
+}
+
+/* Cellules du tableau */
+.users-table td {
+  padding: 16px;
+
+  color: #4e342e;
+  border-bottom: 1px solid #eee2da;
+}
+
+/* Effet au passage de la souris */
+.users-table tbody tr:hover {
+  background-color: #faf5f1;
+}
+
+/* Supprime la bordure de la dernière ligne */
+.users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Badge du rôle */
+.user-role {
+  display: inline-block;
+  padding: 6px 10px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #5d4037;
+  background-color: #f3e5dc;
+  border-radius: 20px;
+}
+
+/* Style général de l’état du compte */
+.user-status {
+  display: inline-block;
+  padding: 6px 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  border-radius: 20px;
+}
+
+/* Compte actif */
+.user-status.active {
+  color: #166534;
+  background-color: #dcfce7;
+}
+
+/* Compte inactif */
+.user-status.inactive {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+
+/* Message affiché en cas d’erreur */
+.users-error {
+  padding: 14px 16px;
+
+  color: #9b2c2c;
+  background-color: #fff5f5;
+
+  border: 1px solid #f5c2c2;
+  border-radius: 9px;
+}
