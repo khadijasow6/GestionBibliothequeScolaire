@@ -109,3 +109,8 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+/* Le conteneur principal de React occupe toute la largeur */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}

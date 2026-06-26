@@ -1,0 +1,124 @@
+
+/* Page générale du tableau de bord */
+.dashboard-page {
+  min-height: 100vh;
+  background-color: #f5efe9;
+  color: #3e2723;
+}
+
+/* En-tête supérieur */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 40px;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #4e342e,
+    #6d4c41
+  );
+  box-shadow: 0 4px 15px rgba(62, 39, 35, 0.2);
+}
+
+/* Titre principal */
+.dashboard-header h1 {
+  margin-bottom: 6px;
+  font-size: 30px;
+}
+
+/* Petit texte de bienvenue */
+.dashboard-header p {
+  color: #efebe9;
+}
+
+/* Bouton de déconnexion */
+.logout-button {
+  padding: 11px 18px;
+  font-weight: 600;
+  color: #4e342e;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+/* Effet lorsque la souris passe sur le bouton */
+.logout-button:hover {
+  background-color: #f3e5dc;
+  transform: translateY(-1px);
+}
+
+/* Contenu principal sous l’en-tête */
+.dashboard-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px;
+  overflow: hidden;
+}
+/* Titre du rôle */
+.dashboard-content h2 {
+  margin-bottom: 28px;
+  font-size: 22px;
+  color: #5d4037;
+}
+
+/* Grille contenant les cartes statistiques */
+.stats-grid {
+  display: grid;
+
+  /* Maximum quatre cartes par ligne */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 22px;
+  width: 100%;
+}
+
+/* Une carte de statistique */
+.stat-card {
+  padding: 26px;
+  background-color: #ffffff;
+  border: 1px solid #e7d8ce;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(78, 52, 46, 0.1);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+/* Effet au passage de la souris */
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(78, 52, 46, 0.16);
+}
+
+/* Nom de la statistique */
+.stat-card h3 {
+  margin-bottom: 18px;
+  font-size: 16px;
+  color: #795548;
+}
+
+/* Nombre affiché dans la carte */
+.stat-card p {
+  font-size: 34px;
+  font-weight: 700;
+  color: #4e342e;
+}
+
+/* Deux cartes par ligne sur une tablette */
+@media (max-width: 1000px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Une seule carte par ligne sur un téléphone */
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
