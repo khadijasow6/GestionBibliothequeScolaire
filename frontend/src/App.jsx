@@ -1,4 +1,5 @@
-
+// Page permettant à l’élève de consulter ses emprunts.
+import MyLoansPage from "./pages/MyLoansPage";
 // Outils permettant de gérer les différentes pages React.
 import {
   BrowserRouter,
@@ -69,6 +70,17 @@ function App() {
             )
           }
         />
+             {/* Page personnelle des emprunts de l’élève */}
+<Route
+  path="/my-loans"
+  element={
+    token ? (
+      <MyLoansPage />
+    ) : (
+      <Navigate to="/login" replace />
+    )
+  }
+/>
 
         {/* Toute adresse inconnue retourne vers une page valide */}
         <Route
