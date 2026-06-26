@@ -3,6 +3,9 @@
 // useState conserve les données et les messages.
 import { useEffect, useState } from "react";
 
+// Formulaire permettant de créer une catégorie.
+import CreateCategoryForm from "../components/CreateCategoryForm";
+
 // Formulaire permettant de créer un auteur.
 import CreateAuthorForm from "../components/CreateAuthorForm";
 
@@ -31,8 +34,8 @@ function BooksPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Cette clé permet de recharger le formulaire du livre
-  // après la création d’un nouvel auteur.
+  // Cette clé recharge le formulaire du livre après
+  // la création d’une catégorie ou d’un auteur.
   const [bookFormKey, setBookFormKey] = useState(0);
 
   // Récupère l’utilisateur connecté.
@@ -42,7 +45,7 @@ function BooksPage() {
     ? JSON.parse(storedUser)
     : null;
 
-  // Seul le personnel peut créer des auteurs et des livres.
+  // Seul le personnel peut gérer le catalogue.
   const canManageBooks =
     currentUser?.role === "ADMINISTRATEUR" ||
     currentUser?.role === "BIBLIOTHECAIRE";
@@ -74,6 +77,19 @@ function BooksPage() {
     loadBooks();
   }, []);
 
+  // Fonction appelée après la création d’une catégorie.
+  const handleCategoryCreated = () => {
+    setError("");
+
+    setSuccess(
+      "La nouvelle catégorie a été créée avec succès.",
+    );
+
+    // Recharge le formulaire afin que la nouvelle
+    // catégorie apparaisse dans la liste.
+    setBookFormKey((currentKey) => currentKey + 1);
+  };
+
   // Fonction appelée après la création d’un auteur.
   const handleAuthorCreated = () => {
     setError("");
@@ -82,8 +98,8 @@ function BooksPage() {
       "Le nouvel auteur a été créé avec succès.",
     );
 
-    // Recharge le formulaire du livre afin que
-    // le nouvel auteur apparaisse dans la liste.
+    // Recharge le formulaire afin que le nouvel
+    // auteur apparaisse dans la liste.
     setBookFormKey((currentKey) => currentKey + 1);
   };
 
@@ -110,8 +126,8 @@ function BooksPage() {
             <h1>Livres</h1>
 
             <p>
-              Gérez les auteurs, les livres et leurs
-              exemplaires.
+              Gérez les catégories, les auteurs, les livres
+              et leurs exemplaires.
             </p>
           </div>
         </header>
@@ -120,6 +136,10 @@ function BooksPage() {
           {/* Formulaires visibles seulement par le personnel */}
           {canManageBooks && (
             <>
+              <CreateCategoryForm
+                onCategoryCreated={handleCategoryCreated}
+              />
+
               <CreateAuthorForm
                 onAuthorCreated={handleAuthorCreated}
               />
