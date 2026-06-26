@@ -1,0 +1,93 @@
+
+/* Conteneur du tableau avec défilement sur petit écran */
+.loans-table-container {
+  width: 100%;
+  overflow-x: auto;
+
+  background-color: #ffffff;
+  border: 1px solid #e2d2c7;
+  border-radius: 14px;
+
+  box-shadow: 0 8px 24px rgba(78, 52, 46, 0.1);
+}
+
+/* Tableau principal des emprunts */
+.loans-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* En-têtes des colonnes */
+.loans-table th {
+  padding: 16px;
+
+  text-align: left;
+  color: #ffffff;
+  background-color: #5d4037;
+}
+
+/* Cellules du tableau */
+.loans-table td {
+  padding: 16px;
+
+  color: #4e342e;
+  border-bottom: 1px solid #eee2da;
+}
+
+/* Effet au passage de la souris sur une ligne */
+.loans-table tbody tr:hover {
+  background-color: #faf5f1;
+}
+
+/* Supprime la bordure de la dernière ligne */
+.loans-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Style général du statut */
+.loan-status {
+  display: inline-block;
+
+  padding: 6px 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  border-radius: 20px;
+}
+
+/* Emprunt en cours */
+.loan-status-en_cours {
+  color: #1e40af;
+  background-color: #dbeafe;
+}
+
+/* Emprunt retourné */
+.loan-status-retourne {
+  color: #166534;
+  background-color: #dcfce7;
+}
+
+/* Emprunt en retard */
+.loan-status-en_retard {
+  color: #9a3412;
+  background-color: #ffedd5;
+}
+
+/* Livre perdu */
+.loan-status-perdu {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+
+/* Message d’erreur */
+.loans-error {
+  padding: 14px 16px;
+
+  color: #9b2c2c;
+  background-color: #fff5f5;
+
+  border: 1px solid #f5c2c2;
+  border-radius: 9px;
+}
+

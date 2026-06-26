@@ -1,5 +1,5 @@
 
-// Outils de React Router pour gérer les différentes pages.
+// Outils permettant de gérer les différentes pages React.
 import {
   BrowserRouter,
   Navigate,
@@ -10,19 +10,19 @@ import {
 // Importation des pages de l’application.
 import BooksPage from "./pages/BooksPage";
 import DashboardPage from "./pages/DashboardPage";
+import LoansPage from "./pages/LoansPage";
 import LoginPage from "./pages/LoginPage";
 
 
 function App() {
   // Récupère le token enregistré après la connexion.
-  // Sa présence signifie que l’utilisateur est connecté.
   const token = localStorage.getItem("accessToken");
 
   return (
-    // Active la navigation React dans toute l’application.
+    // Active la navigation dans l’application.
     <BrowserRouter>
       <Routes>
-        {/* La page d’accueil redirige vers la connexion */}
+        {/* L’adresse principale redirige vers la connexion */}
         <Route
           path="/"
           element={<Navigate to="/login" replace />}
@@ -58,7 +58,19 @@ function App() {
           }
         />
 
-        {/* Toute adresse inconnue retourne au tableau de bord */}
+        {/* Page de gestion des emprunts */}
+        <Route
+          path="/loans"
+          element={
+            token ? (
+              <LoansPage />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Toute adresse inconnue retourne vers une page valide */}
         <Route
           path="*"
           element={
