@@ -181,6 +181,100 @@
     width: 100%;
   }
 }
+/* Formulaire de création d’un emprunt */
+.create-loan-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 18px;
+
+  margin-bottom: 28px;
+  padding: 24px;
+
+  background-color: #ffffff;
+  border: 1px solid #e2d2c7;
+  border-radius: 14px;
+
+  box-shadow: 0 8px 24px rgba(78, 52, 46, 0.1);
+}
+
+/* Titre du formulaire */
+.create-loan-form h2 {
+  grid-column: 1 / -1;
+
+  margin-bottom: 4px;
+
+  font-size: 22px;
+  color: #4e342e;
+}
+
+/* Groupe contenant un label et un champ */
+.loan-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Nom du champ */
+.loan-form-group label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5d4037;
+}
+
+/* Champs de sélection et de date */
+.loan-form-group select,
+.loan-form-group input {
+  width: 100%;
+  padding: 11px 12px;
+
+  color: #3e2723;
+  background-color: #faf7f4;
+
+  border: 1px solid #cdb9aa;
+  border-radius: 8px;
+  outline: none;
+}
+
+/* Effet quand l’utilisateur clique dans un champ */
+.loan-form-group select:focus,
+.loan-form-group input:focus {
+  background-color: #ffffff;
+  border-color: #795548;
+
+  box-shadow: 0 0 0 3px rgba(121, 85, 72, 0.14);
+}
+
+/* Bouton de création */
+.create-loan-button {
+  grid-column: 1 / -1;
+
+  padding: 12px 18px;
+
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #6d4c41;
+
+  border: none;
+  border-radius: 8px;
+}
+
+/* Effet au passage de la souris */
+.create-loan-button:hover {
+  background-color: #4e342e;
+}
+
+/* Bouton désactivé pendant l’envoi */
+.create-loan-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Affichage adapté aux petits écrans */
+@media (max-width: 900px) {
+  .create-loan-form {
+    grid-template-columns: 1fr;
+  }
+}
 
 
 

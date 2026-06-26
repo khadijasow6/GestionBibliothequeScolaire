@@ -1,6 +1,10 @@
+
 // useEffect charge les emprunts à l’ouverture de la page.
 // useState conserve les données et les messages.
 import { useEffect, useState } from "react";
+
+// Formulaire permettant de créer un nouvel emprunt.
+import CreateLoanForm from "../components/CreateLoanForm";
 
 // Barre latérale de navigation.
 import Sidebar from "../components/Sidebar";
@@ -22,6 +26,9 @@ function LoansPage() {
 
   // Identifiant de l’emprunt dont une action est en cours.
   const [actionLoading, setActionLoading] = useState(null);
+
+  // Permet de recréer le formulaire après un nouvel emprunt.
+  const [formKey, setFormKey] = useState(0);
 
   // Message d’erreur.
   const [error, setError] = useState("");
@@ -56,6 +63,21 @@ function LoansPage() {
     loadLoans();
   }, []);
 
+  // Cette fonction est appelée après la création d’un emprunt.
+  const handleLoanCreated = async () => {
+    setError("");
+
+    setSuccess(
+      "Le nouvel emprunt a été créé avec succès.",
+    );
+
+    // Recharge le tableau des emprunts.
+    await loadLoans();
+
+    // Recharge aussi les listes du formulaire.
+    setFormKey((currentKey) => currentKey + 1);
+  };
+
   // Retourne une classe CSS différente selon le statut.
   const getStatusClass = (status) => {
     return `loan-status loan-status-${status.toLowerCase()}`;
@@ -76,6 +98,9 @@ function LoansPage() {
 
       // Recharge la liste pour afficher le nouveau statut.
       await loadLoans();
+
+      // Recharge les exemplaires disponibles du formulaire.
+      setFormKey((currentKey) => currentKey + 1);
     } catch (requestError) {
       console.error(requestError);
 
@@ -112,6 +137,9 @@ function LoansPage() {
 
       // Recharge la liste pour afficher le nouveau statut.
       await loadLoans();
+
+      // Recharge aussi le formulaire.
+      setFormKey((currentKey) => currentKey + 1);
     } catch (requestError) {
       console.error(requestError);
 
@@ -143,10 +171,13 @@ function LoansPage() {
 
         {/* Contenu principal */}
         <section className="dashboard-content">
-          {isLoading && (
-            <p>Chargement des emprunts...</p>
-          )}
+          {/* Formulaire de création d’un emprunt */}
+          <CreateLoanForm
+            key={formKey}
+            onLoanCreated={handleLoanCreated}
+          />
 
+          {/* Messages affichés sous le formulaire */}
           {error && (
             <p className="loans-error">{error}</p>
           )}
@@ -155,12 +186,17 @@ function LoansPage() {
             <p className="loans-success">{success}</p>
           )}
 
+          {isLoading && (
+            <p>Chargement des emprunts...</p>
+          )}
+
           {!isLoading &&
             !error &&
             loans.length === 0 && (
               <p>Aucun emprunt enregistré.</p>
             )}
 
+          {/* Tableau des emprunts */}
           {!isLoading && loans.length > 0 && (
             <div className="loans-table-container">
               <table className="loans-table">
@@ -177,8 +213,8 @@ function LoansPage() {
 
                 <tbody>
                   {loans.map((loan) => {
-                    // Les actions sont disponibles uniquement
-                    // pour un emprunt actif ou en retard.
+                    // Les actions sont possibles uniquement
+                    // pour les emprunts actifs ou en retard.
                     const canManage =
                       loan.status === "EN_COURS" ||
                       loan.status === "EN_RETARD";
@@ -260,3 +296,4 @@ function LoansPage() {
 }
 
 export default LoansPage;
+
