@@ -114,3 +114,16 @@ code {
   width: 100%;
   min-height: 100vh;
 }
+/* Empêche les pages de dépasser horizontalement */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+/* Supprime la marge automatique du navigateur */
+body {
+  margin: 0;
+}

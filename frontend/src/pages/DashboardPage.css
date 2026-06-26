@@ -1,9 +1,15 @@
 
 /* Contient la barre latérale et la partie principale */
+/* Contient la barre latérale et la page principale */
 .dashboard-layout {
   display: flex;
+
   width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
+
+  overflow-x: hidden;
+
   background-color: #f5efe9;
 }
 
