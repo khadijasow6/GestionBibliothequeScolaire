@@ -1,60 +1,105 @@
 
-// useEffect exécute une action au chargement de la page.
-// useState permet de conserver les livres et les états.
+// useEffect charge les livres à l’ouverture de la page.
+// useState conserve les données et les messages.
 import { useEffect, useState } from "react";
 
-// Barre latérale commune aux pages connectées.
+// Formulaire permettant de créer un auteur.
+import CreateAuthorForm from "../components/CreateAuthorForm";
+
+// Formulaire permettant de créer un livre et son exemplaire.
+import CreateBookForm from "../components/CreateBookForm";
+
+// Barre latérale de navigation.
 import Sidebar from "../components/Sidebar";
 
-// Outil configuré pour communiquer avec Django.
+// Outil Axios configuré pour communiquer avec Django.
 import api from "../services/api";
 
-// Styles communs et styles spécifiques à la page Livres.
+// Styles de la page.
 import "./DashboardPage.css";
 import "./BooksPage.css";
 
 
 function BooksPage() {
-  // Stocke la liste des livres reçue depuis Django.
+  // Liste des livres reçue depuis Django.
   const [books, setBooks] = useState([]);
 
-  // Indique si les livres sont encore en chargement.
+  // État de chargement.
   const [isLoading, setIsLoading] = useState(true);
 
-  // Stocke un éventuel message d’erreur.
+  // Messages affichés à l’utilisateur.
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Charge les livres lorsque la page s’ouvre.
+  // Cette clé permet de recharger le formulaire du livre
+  // après la création d’un nouvel auteur.
+  const [bookFormKey, setBookFormKey] = useState(0);
+
+  // Récupère l’utilisateur connecté.
+  const storedUser = localStorage.getItem("user");
+
+  const currentUser = storedUser
+    ? JSON.parse(storedUser)
+    : null;
+
+  // Seul le personnel peut créer des auteurs et des livres.
+  const canManageBooks =
+    currentUser?.role === "ADMINISTRATEUR" ||
+    currentUser?.role === "BIBLIOTHECAIRE";
+
+  // Charge les livres depuis Django.
+  const loadBooks = async () => {
+    try {
+      const response = await api.get("/books/");
+
+      // Accepte une réponse directe ou paginée.
+      const bookList = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
+
+      setBooks(bookList);
+    } catch (requestError) {
+      console.error(requestError);
+
+      setError(
+        "Impossible de charger la liste des livres.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Charge les livres à l’ouverture de la page.
   useEffect(() => {
-    const loadBooks = async () => {
-      try {
-        // Envoie une requête GET vers l’API Django.
-        const response = await api.get("/books/");
-
-        // Accepte une réponse directe ou paginée.
-        const bookList = Array.isArray(response.data)
-          ? response.data
-          : response.data.results || [];
-
-        // Enregistre les livres reçus.
-        setBooks(bookList);
-      } catch (requestError) {
-        console.error(requestError);
-
-        setError(
-          "Impossible de charger la liste des livres.",
-        );
-      } finally {
-        // Le chargement est terminé.
-        setIsLoading(false);
-      }
-    };
-
     loadBooks();
   }, []);
 
+  // Fonction appelée après la création d’un auteur.
+  const handleAuthorCreated = () => {
+    setError("");
+
+    setSuccess(
+      "Le nouvel auteur a été créé avec succès.",
+    );
+
+    // Recharge le formulaire du livre afin que
+    // le nouvel auteur apparaisse dans la liste.
+    setBookFormKey((currentKey) => currentKey + 1);
+  };
+
+  // Fonction appelée après la création d’un livre.
+  const handleBookCreated = async () => {
+    setError("");
+
+    setSuccess(
+      "Le livre et son exemplaire ont été créés avec succès.",
+    );
+
+    // Recharge immédiatement la liste des livres.
+    await loadBooks();
+  };
+
   return (
-    // Contient la barre latérale et la partie principale.
     <div className="dashboard-layout">
       <Sidebar />
 
@@ -65,15 +110,32 @@ function BooksPage() {
             <h1>Livres</h1>
 
             <p>
-              Consultez le catalogue de la bibliothèque.
+              Gérez les auteurs, les livres et leurs
+              exemplaires.
             </p>
           </div>
         </header>
 
-        {/* Contenu principal */}
         <section className="dashboard-content">
-          {isLoading && (
-            <p>Chargement des livres...</p>
+          {/* Formulaires visibles seulement par le personnel */}
+          {canManageBooks && (
+            <>
+              <CreateAuthorForm
+                onAuthorCreated={handleAuthorCreated}
+              />
+
+              <CreateBookForm
+                key={bookFormKey}
+                onBookCreated={handleBookCreated}
+              />
+            </>
+          )}
+
+          {/* Messages */}
+          {success && (
+            <p className="books-success">
+              {success}
+            </p>
           )}
 
           {error && (
@@ -82,54 +144,69 @@ function BooksPage() {
             </p>
           )}
 
+          {isLoading && (
+            <p>Chargement des livres...</p>
+          )}
+
           {!isLoading &&
             !error &&
             books.length === 0 && (
               <p>Aucun livre enregistré.</p>
             )}
 
-          {/* Grille contenant les cartes des livres */}
+          {/* Liste des livres */}
           {!isLoading && books.length > 0 && (
             <div className="books-grid">
               {books.map((book) => (
-                // Une carte pour chaque livre.
                 <article
                   className="book-card"
                   key={book.id}
                 >
                   <h2>{book.title}</h2>
 
-                  {/* Informations détaillées du livre */}
-                  <div className="book-information">
-                    <p>
-                      <strong>ISBN</strong>
-                      <span>{book.isbn}</span>
-                    </p>
+                  <div className="book-details">
+                    <span className="book-label">
+                      ISBN
+                    </span>
+                    <span>{book.isbn}</span>
 
-                    <p>
-                      <strong>Catégorie</strong>
-                      <span>
-                        {book.category_name ||
-                          "Non renseignée"}
-                      </span>
-                    </p>
+                    <span className="book-label">
+                      Catégorie
+                    </span>
+                    <span>
+                      {book.category_name ||
+                        "Non renseignée"}
+                    </span>
 
-                    <p>
-                      <strong>Auteur(s)</strong>
-                      <span>
-                        {book.author_names?.join(", ") ||
-                          "Non renseigné"}
-                      </span>
-                    </p>
+                    <span className="book-label">
+                      Auteur
+                    </span>
+                    <span>
+                      {book.author_names?.length > 0
+                        ? book.author_names.join(", ")
+                        : "Non renseigné"}
+                    </span>
 
-                    <p>
-                      <strong>Année</strong>
-                      <span>
-                        {book.publication_year ||
-                          "Non renseignée"}
-                      </span>
-                    </p>
+                    <span className="book-label">
+                      Année
+                    </span>
+                    <span>
+                      {book.publication_year || "—"}
+                    </span>
+
+                    <span className="book-label">
+                      Éditeur
+                    </span>
+                    <span>
+                      {book.publisher || "—"}
+                    </span>
                   </div>
+
+                  {book.description && (
+                    <p className="book-description">
+                      {book.description}
+                    </p>
+                  )}
                 </article>
               ))}
             </div>
