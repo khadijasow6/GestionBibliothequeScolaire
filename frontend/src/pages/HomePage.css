@@ -1,0 +1,332 @@
+
+/* Page d’accueil complète */
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  color: #3e2723;
+  background:
+    linear-gradient(
+      135deg,
+      #f8f1eb 0%,
+      #eadfd6 100%
+    );
+}
+
+/* Barre de navigation supérieure */
+.home-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  padding: 20px 7%;
+
+  background-color: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid #dfd0c5;
+}
+
+/* Nom de l’application */
+.home-logo {
+  font-size: 23px;
+  font-weight: 800;
+  color: #4e342e;
+}
+
+/* Bouton de connexion */
+.home-login-link {
+  padding: 10px 20px;
+
+  color: #ffffff;
+  background-color: #6d4c41;
+
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.home-login-link:hover {
+  background-color: #4e342e;
+  transform: translateY(-2px);
+}
+
+/* Partie principale de la page */
+.home-main {
+  flex: 1;
+  width: 100%;
+}
+
+/* Première section de présentation */
+.home-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 50px;
+
+  width: min(1200px, 86%);
+  margin: 0 auto;
+  padding: 90px 0 70px;
+}
+
+/* Texte principal */
+.home-hero-content {
+  max-width: 650px;
+}
+
+/* Petit texte au-dessus du titre */
+.home-badge {
+  display: inline-block;
+
+  margin-bottom: 18px;
+  padding: 8px 14px;
+
+  color: #6d4c41;
+  background-color: #ead8cc;
+
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Grand titre */
+.home-hero h1 {
+  margin: 0 0 24px;
+
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.1;
+  color: #3e2723;
+}
+
+/* Paragraphe principal */
+.home-hero p {
+  max-width: 590px;
+  margin-bottom: 32px;
+
+  font-size: 19px;
+  line-height: 1.7;
+  color: #6d5148;
+}
+
+/* Bouton principal */
+.home-primary-button {
+  display: inline-block;
+  padding: 14px 26px;
+
+  color: #ffffff;
+  background-color: #6d4c41;
+
+  border-radius: 9px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+
+  box-shadow: 0 8px 20px rgba(78, 52, 46, 0.22);
+
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.home-primary-button:hover {
+  background-color: #4e342e;
+  transform: translateY(-3px);
+}
+
+/* Zone contenant les livres décoratifs */
+.home-illustration {
+  position: relative;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+
+  min-height: 360px;
+  padding: 40px;
+
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid #dfd0c5;
+  border-radius: 30px;
+
+  box-shadow: 0 20px 45px rgba(78, 52, 46, 0.15);
+}
+
+/* Livres décoratifs */
+.home-book {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 95px;
+  border-radius: 12px 12px 5px 5px;
+
+  font-size: 54px;
+  box-shadow: 0 10px 22px rgba(78, 52, 46, 0.2);
+}
+
+.home-book-one {
+  height: 240px;
+  background-color: #d7ccc8;
+}
+
+.home-book-two {
+  height: 290px;
+  background-color: #bcaaa4;
+}
+
+.home-book-three {
+  height: 210px;
+  background-color: #a1887f;
+}
+
+/* Section des trois fonctionnalités */
+.home-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+
+  width: min(1200px, 86%);
+  margin: 0 auto;
+  padding: 20px 0 80px;
+}
+
+/* Carte d’une fonctionnalité */
+.home-feature-card {
+  padding: 28px;
+
+  background-color: #ffffff;
+  border: 1px solid #e2d2c7;
+  border-radius: 16px;
+
+  box-shadow: 0 10px 26px rgba(78, 52, 46, 0.1);
+
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.home-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(78, 52, 46, 0.16);
+}
+
+/* Icône de la carte */
+.home-feature-icon {
+  display: block;
+  margin-bottom: 16px;
+
+  font-size: 36px;
+}
+
+/* Titre de la carte */
+.home-feature-card h2 {
+  margin: 0 0 12px;
+
+  font-size: 21px;
+  color: #4e342e;
+}
+
+/* Description de la carte */
+.home-feature-card p {
+  margin: 0;
+
+  line-height: 1.6;
+  color: #6d5148;
+}
+
+/* Pied de page */
+.home-footer {
+  width: 100%;
+  padding: 22px;
+
+  text-align: center;
+  color: #eadfd7;
+  background-color: #3e2723;
+}
+
+/* Affichage sur tablette */
+@media (max-width: 900px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    padding-top: 60px;
+  }
+
+  .home-illustration {
+    min-height: 280px;
+  }
+
+  .home-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Affichage sur téléphone */
+@media (max-width: 600px) {
+  .home-navbar {
+    padding: 16px 5%;
+  }
+
+  .home-logo {
+    font-size: 18px;
+  }
+
+  .home-login-link {
+    padding: 9px 13px;
+    font-size: 14px;
+  }
+
+  .home-hero {
+    width: 90%;
+    padding: 45px 0;
+  }
+
+  .home-hero h1 {
+    font-size: 38px;
+  }
+
+  .home-hero p {
+    font-size: 17px;
+  }
+
+  .home-illustration {
+    min-height: 230px;
+    padding: 25px;
+  }
+
+  .home-book {
+    width: 70px;
+    font-size: 40px;
+  }
+
+  .home-book-one {
+    height: 170px;
+  }
+
+  .home-book-two {
+    height: 210px;
+  }
+
+  .home-book-three {
+    height: 150px;
+  }
+
+  .home-features {
+    width: 90%;
+  }
+}
+/* Empêche la barre de navigation de dépasser l’écran */
+.home-navbar {
+  box-sizing: border-box;
+}
+
+/* Tous les éléments respectent correctement leur largeur */
+.home-navbar *,
+.home-page * {
+  box-sizing: border-box;
+}
+

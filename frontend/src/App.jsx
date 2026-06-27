@@ -1,11 +1,5 @@
-// Page permettant à l’élève de consulter ses emprunts.
-import MyLoansPage from "./pages/MyLoansPage";
-// Outils permettant de gérer les différentes pages React.
 
-// Page de gestion des utilisateurs réservée à l’administrateur.
-import UsersPage from "./pages/UsersPage";
-
-
+// Outils permettant de gérer les différentes pages.
 import {
   BrowserRouter,
   Navigate,
@@ -13,11 +7,14 @@ import {
   Routes,
 } from "react-router-dom";
 
-// Importation des pages de l’application.
+// Pages de l’application.
 import BooksPage from "./pages/BooksPage";
 import DashboardPage from "./pages/DashboardPage";
+import HomePage from "./pages/HomePage";
 import LoansPage from "./pages/LoansPage";
 import LoginPage from "./pages/LoginPage";
+import MyLoansPage from "./pages/MyLoansPage";
+import UsersPage from "./pages/UsersPage";
 
 
 function App() {
@@ -28,10 +25,10 @@ function App() {
     // Active la navigation dans l’application.
     <BrowserRouter>
       <Routes>
-        {/* L’adresse principale redirige vers la connexion */}
+        {/* Page d’accueil publique */}
         <Route
           path="/"
-          element={<Navigate to="/login" replace />}
+          element={<HomePage />}
         />
 
         {/* Page de connexion */}
@@ -52,7 +49,7 @@ function App() {
           }
         />
 
-        {/* Page du catalogue des livres */}
+        {/* Catalogue des livres */}
         <Route
           path="/books"
           element={
@@ -64,7 +61,7 @@ function App() {
           }
         />
 
-        {/* Page de gestion des emprunts */}
+        {/* Gestion générale des emprunts */}
         <Route
           path="/loans"
           element={
@@ -75,41 +72,35 @@ function App() {
             )
           }
         />
-             {/* Page personnelle des emprunts de l’élève */}
-<Route
-  path="/my-loans"
-  element={
-    token ? (
-      <MyLoansPage />
-    ) : (
-      <Navigate to="/login" replace />
-    )
-  }
-/>
 
-{/* Page de gestion des utilisateurs */}
-<Route
-  path="/users"
-  element={
-    token ? (
-      <UsersPage />
-    ) : (
-      <Navigate to="/login" replace />
-    )
-  }
-/>
+        {/* Emprunts personnels de l’élève */}
+        <Route
+          path="/my-loans"
+          element={
+            token ? (
+              <MyLoansPage />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
+        {/* Gestion des utilisateurs */}
+        <Route
+          path="/users"
+          element={
+            token ? (
+              <UsersPage />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
-
-        {/* Toute adresse inconnue retourne vers une page valide */}
+        {/* Une adresse inconnue retourne à l’accueil */}
         <Route
           path="*"
-          element={
-            <Navigate
-              to={token ? "/dashboard" : "/login"}
-              replace
-            />
-          }
+          element={<Navigate to="/" replace />}
         />
       </Routes>
     </BrowserRouter>
